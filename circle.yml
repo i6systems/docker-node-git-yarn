@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: node:7.9-alpine
+    working_directory: /docker-node-git-yarn
+    steps:
+      - checkout
+      - run: yarn install
+      - run: yarn test
