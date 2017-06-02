@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: node:7.9-alpine
+      - image: node:7.9-slim
     working_directory: /docker-node-git-yarn
     steps:
       - checkout
