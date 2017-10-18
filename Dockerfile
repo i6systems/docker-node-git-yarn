@@ -1,35 +1,11 @@
-FROM node:6-alpine
+FROM node:6-slim
 MAINTAINER i6 Dev Team <dev-team@i6.io>
-
-ENV HOME=/\
- CLOUDSDK_PYTHON_SITEPACKAGES=1\
- PATH=/google-cloud-sdk/bin:$PATH
-
-RUN set -x\
- && echo "http://nl.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories\
- && apk update\
- && apk --no-cache add --virtual .build-deps\
-  ca-certificates\
-  unzip\
-  wget\
-&& apk --no-cache add\
-  git\
-  zip\
-  bash\
-  openssh-client\
-  py2-openssl\
-  python2\
- && wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.zip\
- && unzip google-cloud-sdk.zip\
- && rm google-cloud-sdk.zip\
- && google-cloud-sdk/install.sh\
-  --usage-reporting=true\
-  --path-update=true\
-  --bash-completion=true\
-  --rc-path=/.bashrc\
- && apk del .build-deps\
- && rm -rf /var/cache/apk/*\
- && google-cloud-sdk/bin/gcloud config set --installation component_manager/disable_update_check true\
- && sed -i -- 's/\"disable_updater\": false/\"disable_updater\": true/g' /google-cloud-sdk/lib/googlecloudsdk/core/config.json\
- && mkdir /.ssh
+RUN apt-get update && apt-get install -y apt-transport-https git lsb-release zip \
+    && export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" \
+    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && curl -sS https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+    && apt-get update && apt-get install -y yarn google-cloud-sdk \
+    && rm -rf /var/lib/apt/lists/*
 
