@@ -1,4 +1,4 @@
-FROM node:6-slim
+FROM node:7-slim
 MAINTAINER i6 Dev Team <dev-team@i6.io>
 RUN apt-get update && apt-get install -y apt-transport-https git lsb-release zip \
     && export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" \
