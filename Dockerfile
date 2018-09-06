@@ -1,16 +1,30 @@
-FROM node:7-slim
+FROM alpine:latest as downloads
 MAINTAINER i6 Dev Team <dev-team@i6.io>
-RUN apt-get update && apt-get install -y apt-transport-https git lsb-release zip build-essential \
-    && export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" \
-    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && curl -sS https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-    && echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-    && apt-get update && apt-get install -y yarn google-cloud-sdk \
-    && set -x \
-    && VER="17.03.0-ce" \
-    && curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz \
-    && tar -xz -C /tmp -f /tmp/docker-$VER.tgz \
-    && mv /tmp/docker/* /usr/bin \
+ENV GCLOUD_BINARY=google-cloud-sdk-215.0.0-linux-x86_64.tar.gz
+ENV GCLOUD_CHECKSUM=4cc8bf266848342a4f2b5b96381c7d7f4d8de79b6a1e9ae9ab855664eea65a52
+
+RUN wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${GCLOUD_BINARY} \
+    && echo "${GCLOUD_CHECKSUM}  ${GCLOUD_BINARY}" | sha256sum -c -s \
+    && tar zxf ${GCLOUD_BINARY} google-cloud-sdk \
+    && rm ${GCLOUD_BINARY}
+
+FROM node:6-slim as six
+COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
+COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
+RUN apt-get update && apt-get install -y lsb-release git \
+    && /google-cloud-sdk/install.sh -q \
     && rm -rf /var/lib/apt/lists/*
 
+FROM node:7-slim as seven
+COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
+COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
+RUN apt-get update && apt-get install -y lsb-release git \
+    && /google-cloud-sdk/install.sh -q \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM node:8-slim as eight
+COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
+COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
+RUN apt-get update && apt-get install -y lsb-release git \
+    && /google-cloud-sdk/install.sh -q \
+    && rm -rf /var/lib/apt/lists/*

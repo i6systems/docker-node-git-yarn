@@ -1,0 +1,50 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: node:7.9-slim
+    working_directory: /docker-node-git-yarn
+    steps:
+      - checkout
+      - run: yarn install
+      - run: yarn test
+
+  release:
+    working_directory: /docker-node-git-yarn
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Docker login
+          command: |
+            echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin
+
+      - run:
+          name: Docker Build
+          command: |
+            docker build --target six --tag i6group/docker-node-git-yarn:6 .
+            docker build --target seven --tag i6group/docker-node-git-yarn:7 .
+            docker build --target eight --tag i6group/docker-node-git-yarn:8 .
+
+      - run:
+          name: Docker Push
+          command: |
+            docker push i6group/docker-node-git-yarn:6
+            docker push i6group/docker-node-git-yarn:7
+            docker push i6group/docker-node-git-yarn:8
+
+workflows:
+  version: 2
+  build-release:
+    jobs:
+      - build
+      - release:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master

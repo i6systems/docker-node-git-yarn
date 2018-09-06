@@ -1,6 +1,6 @@
 node_modules/
 .gitignore
-circle.yml
+.circleci/circle.yml
 README.md
 yarn.lock
 build/
