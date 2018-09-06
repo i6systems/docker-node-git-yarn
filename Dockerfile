@@ -12,19 +12,19 @@ FROM node:6-slim as six
 COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
 COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
 RUN apt-get update && apt-get install -y lsb-release git build-essential zip \
-    && /google-cloud-sdk/install.sh -q \
+    && /google-cloud-sdk/install.sh -q --path-update=true --rc-path=/root/.profile \
     && rm -rf /var/lib/apt/lists/*
 
 FROM node:7-slim as seven
 COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
 COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
 RUN apt-get update && apt-get install -y lsb-release git build-essential zip \
-    && /google-cloud-sdk/install.sh -q \
+    && /google-cloud-sdk/install.sh -q --path-update=true --rc-path=/root/.profile \
     && rm -rf /var/lib/apt/lists/*
 
 FROM node:8-slim as eight
 COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
 COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
 RUN apt-get update && apt-get install -y lsb-release git build-essential zip \
-    && /google-cloud-sdk/install.sh -q \
+    && /google-cloud-sdk/install.sh -q --path-update=true --rc-path=/root/.profile \
     && rm -rf /var/lib/apt/lists/*
