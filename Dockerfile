@@ -11,20 +11,20 @@ RUN wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${GCLOUD_BIN
 FROM node:6-slim as six
 COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
 COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
-RUN apt-get update && apt-get install -y lsb-release git \
+RUN apt-get update && apt-get install -y lsb-release git build-essential \
     && /google-cloud-sdk/install.sh -q \
     && rm -rf /var/lib/apt/lists/*
 
 FROM node:7-slim as seven
 COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
 COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
-RUN apt-get update && apt-get install -y lsb-release git \
+RUN apt-get update && apt-get install -y lsb-release git build-essential \
     && /google-cloud-sdk/install.sh -q \
     && rm -rf /var/lib/apt/lists/*
 
 FROM node:8-slim as eight
 COPY --from=docker:18 /usr/local/bin/docker* /usr/bin/
 COPY --from=downloads /google-cloud-sdk /google-cloud-sdk
-RUN apt-get update && apt-get install -y lsb-release git \
+RUN apt-get update && apt-get install -y lsb-release git build-essential \
     && /google-cloud-sdk/install.sh -q \
     && rm -rf /var/lib/apt/lists/*
